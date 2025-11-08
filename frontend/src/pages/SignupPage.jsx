@@ -1,10 +1,35 @@
-import { Eye, EyeOff,   Lock, Mail, MessageSquare, User, Users } from 'lucide-react';
+import { Eye, EyeOff,   Loader2,   Lock, Mail, MessageSquare, User, Users } from 'lucide-react';
 import AuthImagePattern from '../components/AuthImagePattern';
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
+import { useAuthStore } from '../store/useAuthStore';
+import toast from 'react-hot-toast';
 
 const SignupPage = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const {signup, isSigningUp } = useAuthStore();
+  const [formData, setFormData] = useState({
+    fullName: "",
+    email: "",
+    password: ""
+  });
+
+  const validateForm = () =>{
+    console.log("validate form -- 1")
+    if (!formData.fullName.trim()) return toast.error("Full name is required");
+    if (!formData.email.trim()) return (toast.error("Email is required"));
+    if (!/\S+@\S+\.\S+/.test(formData.email)) return toast.error("Invalid email format");
+    if (!formData.password) return toast.error("Password is required");
+    if (formData.password.length < 6) return toast.error("Password must be at least 6 characters");
+    console.log("Valdiate form -- 2")
+    return true;
+  };
+  const handleSubmit = (e) => {
+    e.preventDefault(); // to prevent refresh the page
+
+    const success = validateForm();
+    if(success ===  true) signup(formData)
+  }  
 
   return (
     // The whole page
@@ -25,7 +50,7 @@ const SignupPage = () => {
             </div>
           </div>
           <form 
-            // onSubmit={handleSubmit} 
+            onSubmit={handleSubmit} 
             className="space-y-6">
             <div>
               <label className='label'>
@@ -39,8 +64,8 @@ const SignupPage = () => {
                   type="text"
                     className={`input input-bordered w-full pl-10`}
                     placeholder="John Doe"
-                    // value={formData.fullName}
-                    // onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                    value={formData.fullName}
+                    onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                  />
               </div>
             </div>
@@ -56,8 +81,8 @@ const SignupPage = () => {
                   type="email"
                   className={`input input-bordered w-full pl-10`}
                   placeholder="you@example.com"
-                  // value={formData.email}
-                  // onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 />
               </div>
             </div>
@@ -70,25 +95,22 @@ const SignupPage = () => {
                   <Lock className="size-5 text-base-content/40"/>
                 </div>
                 <input 
-                // type={showPassword ? "text" : "password"}
-                  type='text'
+                  type={showPassword ? "text" : "password"}
                   className={`input input-bordered w-full pl-10`}
                   placeholder="••••••••"
-                  // value={formData.password}
-                  // onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 />
                 <button 
                   type='button'
                   className='absolute inset-y-0 right-0 pr-3 flex items-center'
-                  // onClick={() => setShowPassword(!showPassword)}
+                  onClick={() => setShowPassword(!showPassword)}
                 >
-                  {/* {showPassword ? (
+                  {showPassword ? (
                     <EyeOff className="size-5 text-base-content/40" />
                   ) : (
                     <Eye className="size-5 text-base-content/40" />
-                  )} */}
-                  <Eye/>
-                  <EyeOff/>
+                  )}
                 </button>
               </div>
             </div>
@@ -96,9 +118,16 @@ const SignupPage = () => {
             <button 
               type="submit" 
               className="btn btn-primary w-full" 
-              // disabled={isSigningUp}
+              disabled={isSigningUp}
             >
-              Create Account
+              {isSigningUp ? (
+                <>
+                  <Loader2 className="size-5 animate-spin" />
+                  Loading...
+                </>
+              ) : (
+                "Create Account"
+              )}
             </button>
           </form>
 
