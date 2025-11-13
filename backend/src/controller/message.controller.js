@@ -54,7 +54,6 @@ export const sendMessage = async (req, res) => {
 
         //realtime functionality goes here => socket.io
         
-
         res.status(201).json(newMessage);
     } catch (error) {
         console.log("Error in send Message", error.message);
