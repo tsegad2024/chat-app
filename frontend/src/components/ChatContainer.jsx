@@ -4,14 +4,37 @@ import { useChatStore } from "../store/useChatStore";
 import MessageSkeleton from "./skeletons/MessageSkeleton";
 import { useAuthStore } from "../store/useAuthStore";
 import { formatMessageTime } from "../lib/utils";
+import MessageInput from "./MessageInput";
+import ChatHeader from "./ChatHeader";
 
 const ChatContainer = () => {
-// const {messages, getMessages, isMessagesLoading, selectedUser}
+    const {messages, getMessages, isMessagesLoading, selectedUser, subscribeToMessages, unsubscribeFromMessages} = useChatStore();
+    const { authUser } = useAuthStore(); 
+    const messageEndRef = useRef(null);
 
+    useEffect(() => {
+        getMessages(selectedUser._id)
+    }, [selectedUser._id, getMessages])
+
+    useEffect(() => {
+        if (messageEndRef.current && messages) {
+            messageEndRef.current.scrollIntoView({behaviour: "smooth"})
+        }
+    }, [messages]);
+
+    if(isMessagesLoading) {
+        return (
+            <div className='flex-1 flex flex-col overflow-auto'>
+                <ChatHeader/>
+                <MessageSkeleton/>
+                <MessageInput/>
+            </div>
+        )
+    }
   return (
     <div className='flex-1 flex flex-col overflow-auto'>
-      {/* <ChatHeader/> */}
-      {/* <div className='flex-1 overflow-y-auto p-4 space-y-4'>
+      <ChatHeader/>
+      <div className='flex-1 overflow-y-auto p-4 space-y-4'>
         {messages.map((message) => (
                     <div 
                         key={message._id}
@@ -43,7 +66,7 @@ const ChatContainer = () => {
                         </div>
                     </div>
                 ))} 
-      </div> */}
+      </div>
       <MessageInput/>
     </div>
   )
