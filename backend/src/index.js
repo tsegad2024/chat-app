@@ -26,13 +26,14 @@ app.use("/api/auth", authRoute);
 app.use("/api/messages", messageRoute);
 
 if (process.env.NODE_ENV === "production") {
-    app.use(express.static(path.join(__dirname, "../frontend/dist")));
+    const frontendDistPath = path.join(__dirname, "../frontend/dist");
+    
+    // Serve static files
+    app.use(express.static(frontendDistPath));
 
-    // app.get("*", (req, res) => {
-    //     res.sendFile(path.join(__dirname, "../frontend", "dist", "index.htmls"));
-    // })
+    // Catch-all route to serve index.html for SPA
     app.get('/*', (req, res) => {
-        res.sendFile(path.join(__dirname, 'index.html')); // or your handler
+        res.sendFile(path.join(frontendDistPath, 'index.html'));
     });
 }
 
